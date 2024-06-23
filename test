@@ -13,6 +13,9 @@ helm install longhorn longhorn/longhorn --namespace longhorn-system --create-nam
 kubectl -n longhorn-system get pod
 kubectl get pods -n longhorn-system
 
+ubectl annotate storageclass longhorn storageclass.kubernetes.io/is-default-class=true --overwrite
+kubectl annotate storageclass vsphere-csi storageclass.kubernetes.io/is-default-class=false --overwrite
+kubectl get storageclass
 
 replicaCount: 1
 
