@@ -28,22 +28,28 @@ database:
     secretName: jira-connect
     usernameSecretKey: username
     passwordSecretKey: password
+
+
 volumes:
   localHome:
     persistentVolumeClaim:
       create: true
-      storageClassName: gp2
+      storageClassName: longhorn
       resources:
         requests:
           storage: 10Gi
     mountPath: "/var/atlassian/application-data/jira"
+
   sharedHome:
     persistentVolumeClaim:
       create: true
-      storageClassName: gp2
+      storageClassName: longhorn
       resources:
         requests:
           storage: 10Gi
+    mountPath: "/var/atlassian/application-data/shared-home"
+
+
 
 ingress:
   create: true
