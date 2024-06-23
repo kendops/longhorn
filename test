@@ -1,0 +1,88 @@
+kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.2/deploy/prerequisite/longhorn-iscsi-installation.yaml
+kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.2/deploy/prerequisite/longhorn-nfs-installation.yaml
+kubectl get pod | grep longhorn-iscsi-installation
+kubectl get pod | grep longhorn-nfs-installation
+
+# kubectl apply -f iscsi-dependency.yaml
+
+### 3. Next, install Longhorn with Helm:
+helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace
+
+### 4. Verify the Installation
+### Check the deployment status. All Longhorn components should be running:
+kubectl -n longhorn-system get pod
+kubectl get pods -n longhorn-system
+
+
+replicaCount: 1
+
+database:
+  type: postgres72
+  #url: jdbc:postgresql://postgresql:5432
+  url: jdbc:postgresql://postgres-postgresql.jira.svc.cluster.local:5432
+  driver: org.postgresql.Driver
+  credentials:
+    secretName: jira-connect
+    usernameSecretKey: username
+    passwordSecretKey: password
+volumes:
+  localHome:
+    persistentVolumeClaim:
+      create: true
+      storageClassName: gp2
+      resources:
+        requests:
+          storage: 10Gi
+    mountPath: "/var/atlassian/application-data/jira"
+  sharedHome:
+    persistentVolumeClaim:
+      create: true
+      storageClassName: gp2
+      resources:
+        requests:
+          storage: 10Gi
+
+ingress:
+  create: true
+  openShiftRoute: false
+  routeHttpHeaders: {}
+  className: "nginx"
+  nginx: true
+  maxBodySize: 250m
+  proxyConnectTimeout: 60
+  proxyReadTimeout: 60
+  proxySendTimeout: 60
+  host: jira.solvweb.net
+  path:
+
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # cert-manager.io/issuer: rancher
+    # cert-manager.io/issuer-kind: Issuer
+    # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    # external-dns.alpha.kubernetes.io/target: rke2-homelab-tunnel.solvweb.net
+
+  https: true
+  #
+  tlsSecretName: jira-tls
+resources:
+  requests:
+    memory: 2Gi
+    cpu: 500m
+  limits:
+    memory: 2Gi
+
+jira:
+  s3Storage:
+    avatars:
+      bucketName:
+      bucketRegion:
+      endpointOverride:
+  clustering:
+    enabled: true
+
+
+
+
+
+
